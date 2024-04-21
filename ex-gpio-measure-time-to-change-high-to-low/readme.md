@@ -5,7 +5,7 @@ This example demonstrates measuring changes in capacitance by recording the time
 ## Fluid Level Sensing in Embedded Rust on ESP32 CPU by measuring change in Capacitance
 This project aims to measure changes in capacitance using a sensor electrode that acts as a variable capacitor. The electrode will be a foil strip taped to a water bottle. This method can be applied to any large enough metallic surface, allowing the CPU sufficient time to detect a voltage rise.
 
-Furthermore, it can be used to sense human touch. With a large enough sensor, it can detect changes in human proximity as a person moves closer to or further from the sensor.
+It can be used to sense human touch. With a large enough sensor, it can detect changes in human proximity as a person moves closer to or further from the sensor.
 
 ### Source
 - [Rust source main.rs](src/main.rs)
@@ -22,12 +22,22 @@ To avoid the complexities of low-level access through esp-idf-sys, I'm seeking a
 Tested on esp32-s3-mini-1 on custom RaimAmp.com board on 2024-04-20
 
 ### Results and Notes
+I'm pretty happy with the linearity and response. There are some variations, but these could easily be caused by my imperfect cutting of the foil tape and the use of a measuring cup and syringe to add water.
 
-- Aluminum tape used as sensors ws cut by hand and has some minor wrinkles which will cause some variability in readings.
+There is a significant jump in readings from an empty bottle to a bottle with some water. This jump needs to be accounted for when using this method to measure tank level.
 
-- There is a huge increase from empty to first water increment.   This is great if you want to measure empty tank but makes the first reading look skewed.
+![alt text](img/sample-calibration-chart.jpg)
 
-- After adding water some inevitably splashes on sides which causes higher readings that drop until they reach a baseline after water has a chance to run down and sides dry a little. I was not perfectly reliable when waiting for this to occur so some variability was introduced.
+Additionally, the readings accelerate at the end when the bottle tapers. It probably would have been better to stop at 85% full and adjust the total capacity downward.
+
+Even with tanks of variable shapes, interpolation from point to point can be used for accurate estimation.
+
+
+- Aluminum tape used as sensors was cut by hand and has some minor wrinkles, which will cause some variability in readings. 
+
+- There is a large increase from empty to the first water increment. This is great if you want to measure an empty tank, but it makes the first reading appear skewed. 
+
+- After adding water, some inevitably splashes on the sides, causing higher readings that drop until they reach a baseline after the water has a chance to run down and the sides dry a little. I wasn't perfectly consistent when waiting for this to happen, so some variability was introduced. 
 
 ### Steps:
 
@@ -140,15 +150,21 @@ I did not have a 8M resistor available but did have a bunch of 1M resistor so so
 ![alt text](img/rainamp-sensor-board-mods-internal-varuable-capacitor_20240420_174507593~2.jpg)
 - This Board Features
   - ESP32 S3 Mini 4MB firmware, 2MB PS RAM
-  - DS1820B Temperature sensor
-  - 1/2 duplex RS485 transceiver
   - Power regulator handeling input between 4.5 to 36V
-  - 15 Amp Mostor Driver with activity LED and large buffer capacitors
-  - Jtag sel, romp print, spi voltage broken out
-  - JTAG connector - pins can be repurposed if JTAG not needed
+  - DS1820B Temperature sensor
+  - I2C pinout with pullups in place
+  - 1/2 duplex RS485 transceiver with optional termination
+  - 1 Wire header with pullup can repurpose if desolder pullup
+  - dht22 header with pullup  can repurpose if desolder pullup
+  - 15 Amp low side Motor Driver with activity LED and large buffer capacitors
+  - Jtag sel, romp print, spi voltage broken ready header & jumper
+  - JTAG connector pins can be repurposed if JTAG not needed
   - 10 available IO pins most with ADC and touch capability
   - 3 pins reserved for capacitive sensing can be repurposed
-
+  If others could benefit from this board then let know what they 
+  would be worth to see if we could afford to make them available.
+  info@rainamp.com
+  
 
 ## Picture of Bottle with electrode
 ![alt text](img/var-cap-sensor-for-bottle_20240420_174810579~2.jpg)
@@ -162,18 +178,14 @@ I did not have a 8M resistor available but did have a bunch of 1M resistor so so
 ## Sample Data Empty Bottle Human touching electrode sensor
 ![alt text](img/measurement-electrode-on-bottle-touch-with-thumb.jpg)
 
-## Sample Data Full bottle human touching electrode sensor
 
-
-## Sample Data from Electrode on Bottle holding hand 1" from surface
+## Sample Data Empty Bottle human proximity holding hand 1" from surface
 ![alt text](img/mesurement-human-hand-1-inch-from-surface.jpg)
 
 
 ## Sample Data from Water Filling a Bottle
+![alt text](img/sample-calibration-readings.jpg)
 
-
-
-## Sample Data from Human Proximity 
 
 # Notes for Improvement
 - Use two flat bars close together such as 1/8" and move inside the bottle. Coat them with plastic so they can not interact electrically or corrode. 
@@ -206,3 +218,21 @@ The code `csense_drv.set_low()?;` converted us from input pin back into
 an output pin but conversion seems glitchy with weird timing which
 is weird because it seems to work ok in arduino.
         
+# About Us 
+If you find value in these examples please add a link to our main 
+product site https://RainAmp.com to one or more of your sites or 
+articles. Please let us know if you add links so we can reference 
+them.    If you feel like donating funds to help accelerate these
+examples then please contact us info@RainAmp.com    
+
+At our small shop, we combine a deep understanding of physics and fundamental electronics to achieve results others might deem overly complex or expensive. We handle everything in-house, from designing circuits and PCBs using discrete components to writing firmware and integrating with cloud components, 
+machine learning and GUIs as needed.
+
+#### Need help accelerating your impossible project?
+If others have told you your project is impossible or will take years, we can help! We excel at taking on challenges others shy away from.
+
+#### Tired of cookie-cutter solutions?
+We understand your frustration with engineers who simply slap open-source firmware on existing boards and call it a product. We offer a more tailored approach, creating solutions specifically for your needs.
+
+#### Let's talk!
+If you're looking for a team that can take your project from concept to reality, we'd love to hear from you.

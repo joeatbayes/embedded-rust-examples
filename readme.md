@@ -1,19 +1,13 @@
 * [LICENSE](LICENSE) - Please give us links from your articles
   and sites if you find our work useful.
 
-* [research](research.md) Rust Notes on ESP as well as examples 
-  from others.  I can not claim that I found these examples 
-  great which is the main reason I started producing my own 
-  which I know will compile on the ESP32 S3 mini on our 
-  custom RainAmp.com sensor board.
+* **[research](research.md)** Rust Notes on ESP with Examples. 
+  I haven't found existing examples to be particularly useful, accurate, or compilable. Consequently, I've begun creating my own that are guaranteed to compile for a ESP32 S3 mini on our custom RainAmp.com sensor board..
 
-* [linux rust install](linux-install.md)
+* **[linux rust install](linux-install.md)**
+* [first app after install](first-rust-app-after-toolchain-installed.md)
 
-* [humid port](chat-gpt-port-humid.md) example output of chatgpt attempt to port my humid code.
-
-* [debugging-reset](debugging-reset.md) research into why the reset button is not working as expected.
-
-* [windows-wsl-install](windodows-wsl-install.md) Notes collected when trying to get rust toolchain working on WSL under windows.  Got to build but never sucessful flash from WSL.
+* **[windows-wsl-install](windodows-wsl-install.md)** Notes collected when trying to get rust toolchain working on WSL under windows.  Got to build but never sucessful flash from WSL.
 
 
 # Rust ESP32 Examples 
@@ -44,7 +38,7 @@ with 4MB flash and 2MB PS RAM.
     - Change OpenDrive GPIO pin mode between Drain and high impedance
     - Oversampling to improve reading stability 
 
-    This project aims to measure changes in capacitance using a foil strip sensor taped to a bottle as the water level fluctuates. The idea is to track the time it takes for a circuit to discharge (not charge) from a high voltage (around 3.3V) to a specific threshold voltage for a logic low state (around 0.7V). The theory is that a higher capacitance, caused by increased water level, should take longer to discharge. Conversely, a lower capacitance due to decreased water level should discharge faster.
+    This project aims to measure changes in capacitance using a foil strip sensor taped to a bottle. The idea is to track the time it takes for a circuit to charge from 0V to a logic high transition voltage around 0.7V.The theory is that a higher capacitance, caused by increased water level, should take longer to charge. Conversely, a lower capacitance due to decreased water level should charge faster.
     *uses esp-idf-hal* 
 
 
@@ -99,3 +93,22 @@ with 4MB flash and 2MB PS RAM.
 - TODO: One Rust project built for different board with different CPU 
   and differnt Pin assignments.
   - Show how using Rust config and macros
+
+# About Us
+If you find value in these examples please add a link to our main 
+product site https://RainAmp.com to one or more of your sites or 
+articles. Please let us know if you add links so we can reference 
+them.    If you feel like donating funds to help accelerate these
+examples then please contact us info@RainAmp.com    
+
+At our small shop, we combine a deep understanding of physics and fundamental electronics to achieve results others might deem overly complex or expensive. We handle everything in-house, from designing circuits and PCBs using discrete components to writing firmware and integrating with cloud components, 
+machine learning and GUIs as needed.
+
+#### Need help accelerating your impossible project?
+If others have told you your project is impossible or will take years, we can help! We excel at taking on challenges others shy away from.
+
+#### Tired of cookie-cutter solutions?
+We understand your frustration with engineers who simply slap open-source firmware on existing boards and call it a product. We offer a more tailored approach, creating solutions specifically for your needs.
+
+#### Let's talk!
+If you're looking for a team that can take your project from concept to reality, we'd love to hear from you.
