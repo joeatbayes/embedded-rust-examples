@@ -101,14 +101,16 @@ See Also:
 
   #### CPU Pin Assignments
   - LED1 - LED Pin on GPIO-11
-  - SENS1- Cap Sense Pin on GPIO-2
+  - SENS1- GPIO pin used as sensor On GPIO-1
+  - SENS2- GPIO pin used as driver On GPIO-2
       
   #### Wiring 
   - GPIO Pin ->  LED ->  4.7K resistor -> Ground  
-  - Sense1 -> 10M 0.1% resistor -> GND
+  - Sense1 -> 10M 0.1% resistor -> 3.3V
   - Sense1 -> 2" X 4" Alumimum Foil or Tape taped on outside of bottle
               Some foil has plastic coating make sure you have zero 
               Ohm measued from connecting wire to Foil. 
+  - Sense2 -> Sense1
 
   
   #### Capacitive Sensor schematic
