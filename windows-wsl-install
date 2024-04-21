@@ -1,0 +1,176 @@
+## Windows specific
+
+### Got to compile on WSL but was never able to get to flash
+on WSL.  Was eventually able to get the monitor to work.
+ 
+
+### Fixing a WSL Serial port access issue
+
+Fixing WSL ubuntu linux so you can gain 
+access to serial com ports to do the flashing.
+Install the following tool to allow WSL to access Windows COM ports
+See: https://learn.microsoft.com/en-us/windows/wsl/connect-usb 
+AND: https://github.com/dorssel/usbipd-win/releases
+AND https://www.youtube.com/watch?v=fz0B3kPjGlQ
+
+
+```
+# Start Power Shell as admin
+wsl --update
+#  This will terminate your ubuntu windows 
+#  and is needed because the feature to connect comm ports
+#  is relativley recent.
+```
+```
+# Never got flashing from windows WSL to work but was able to 
+# use this to allow linux code to interact with previously
+# flashed devices.
+
+# From Powershell
+wsl -l -v 
+wsl --terminate Ubuntu
+# Restart Ubuntu
+# Back in ubuntu prompt
+
+
+#Only for ESP32 flashing on WSL since ESP Flash will not work on WSL
+  # https://github.com/abobija/idfx
+  # https://gist.github.com/abobija/2f11d1b2c7cb079bec4df6e2348d969f
+   curl https://git.io/JyBgj --create-dirs -L -o $HOME/bin/idfx && chmod u+x $HOME/bin/idfx
+   . ~/.profile || true
+
+# Use the Windows COM ports in WSL Ubuntu is a problem
+# There is a way to map them through but the espflash utility
+# used by default by cargo run does not recognize the com port.
+
+# Allowing Access of WSL to Windows COM ports
+# Start Power Shell as admin
+usbipd list
+  # Should show a list of avaialble com ports Find the bus id
+  # that matches the com port where device is attached. 
+usbipd bind --busid 4-1
+  # replace 4.1 with correct number you got from list.
+usbipd attach --wsl --busid 4-1
+  # replace 4.1 with correct number you got from list.
+
+# I tried adding my user to dialout group but didn't work.
+# so trying it as sudo but sudo looses local paths. So 
+# use which esptool.py to find the path of the esptool.py and 
+# modify the command below to match.
+
+# Back in Ubuntu shell
+lsusb
+  # Should show your ESP32 device attached to the com port 
+  # specified earlier.
+
+
+ECOM port your board is actually connected to.
+# com5 maps to /dev/tty5
+sudo python esptool.py --port /dev/tty5 erase_flash
+#esptool.py --port PORT_NAME erase_flash
+#esptool.py --port PORT_NAME --baud 1000000 write_flash -z 0x1000 FIRMWARE.bin
+
+
+
+sudo source $HOME/export-esp.sh;source $HOME/esp/esp-idf/export.sh; python ~/.espressif/python_env/idf5.2_py3.10_env/bin/esptool.py --port /dev/tty5 erase_flash
+
+# Did not work for rust project
+# ~/bin/idfx flash COM8
+#~/bin/idfx monitor COM8
+
+```
+
+
+
+## Toolchain setup 
+
+- [Install ESP 32 rust tool chain](https://docs.esp-rs.org/book/installation/riscv-and-xtensa.html)   
+- [Install ESP-IDF and first project setup](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html)  
+- [Install Rust on linux using rustup](https://www.rust-lang.org/tools/install) ## Install on ubuntu under windows   
+```
+######
+### Ubuntu Update
+######
+# Ensure we have a modern glib c will be needed latter for cargo
+# The glibc embedded in Ubuntu 20.x is too old and will not work
+# Upgrading to Ubuntu 22 bypasses the problem.
+cd ~
+sudo apt update
+sudo apt full-upgrade
+sudo apt upgrade
+sudo do-release-upgrade
+# This process will require answering yes several times.
+# Do not execut this process if you have critical data
+# or code in WSL which can not operate on a newer version
+# of ubuntu.
+
+####
+## Enjsure Key pre-requisits are installed
+####
+# Ensure Python 3.8 or newer is installed
+sudo apt-get install git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0 curl 
+# may not be needed 
+sudo pip install pyserial
+
+####
+## Give current user access to serial ports
+####
+sudo usermod -aG dialout $USER
+#sudo usermod -aG dialout jwork
+ln -s /usr/bin/python3 /usr/bin/python
+
+sudoedit /etc/udev/rules.d/50-myusb.rules
+
+# Save this text:
+KERNEL=="ttyUSB[0-9]*",MODE="0666"
+KERNEL=="ttyACM[0-9]*",MODE="0666"
+
+# Optional add user to sudoers list
+sudo usermod -aG sudo $USER
+
+
+
+######
+# Install the Core IDF for ESP32
+######
+
+
+ln -s /usr/bin/python3 /usr/bin/python
+
+
+mkdir -p ~/esp
+cd ~/esp
+git clone -b v5.2.1 --recursive https://github.com/espressif/esp-idf.git
+cd ~/esp/esp-idf
+sudo ln -s /usr/bin/python3 /usr/bin/python
+# RESTART SHELL
+
+sudo idf_tools.py install-python-env
+./install.sh esp32,esp32s2,esp32s3,esp32c2
+cp export.sh ~
+# RESTART SHELL
+
+######
+# Install the Basic rust compiler
+######
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# RESTART SHELL
+
+######
+# Add Rust portions of Build chain for ESP32
+######
+sudo apt install -y pkg-config libusb-1.0-0-dev libftdi1-dev
+sudo apt-get install libudev-dev
+rustup update
+cargo install espup
+espup install
+# Source this file in every terminal:
+source $HOME/export-esp.sh
+source $HOME/esp/esp-idf/export.sh
+cargo install ldproxy
+cargo install cargo-espflash
+cargo install espflash
+cargo install cargo-flash
+cargo install cargo-generate
+
+```
