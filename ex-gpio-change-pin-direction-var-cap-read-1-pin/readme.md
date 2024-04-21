@@ -1,23 +1,55 @@
-#ESP32 Embedded Rust: Measuring Capacitance with Discharge Time
+# Measuring Capacitance with Rust on ESP32 CPU using 1 Pin 
 
-This example demonstrates measuring changes in capacitance by recording the time it takes for a variable capacitor to discharge.
+## ESP32 Embedded Rust: Measuring Capacitance with Discharge Time
 
-## Fluid Level Sensing in Embedded Rust on ESP32 CPU by measuring change in Capacitance
-This project aims to measure changes in capacitance using a sensor electrode that acts as a variable capacitor. The electrode will be a foil strip taped to a water bottle. This method can be applied to any large enough metallic surface, allowing the CPU sufficient time to detect a voltage rise.
+This example demonstrates measuring changes in capacitance by recording the time it takes for a variable capacitor to discharge by measuring the time the capacitor takes to 
+drop from VCC (3.3V) to 0.7V through a known resistor. 
 
-It can be used to sense human touch. With a large enough sensor, it can detect changes in human proximity as a person moves closer to or further from the sensor.
+### Fluid Level Sensing in Embedded Rust on ESP32 CPU by measuring change in Capacitance
+For testing the electrode will be a two foil strips afixed to 
+the outside of a water bottle.  The Capacitance is varied by filling the bottle with various amounts of water.  One stip oscilates from VCC to 0.7V while the other on the opposite side of bottle is connected to ground.  This forms a capacitor with air as the dielectric when empty and water as the dielectric as water is added.
+
+### Human Proximity Sensing. 
+This method can also be used to sense human touch. With a large enough sensor, it can detect changes in human proximity as a person moves closer to or further from the sensor.
+
+### ESP32 Rust Features Demonstrated:
+    - Change GPIO Pin Direction
+    - Read GPIO Status
+    - Using Polling to detect GPIO status change    
+    - Measure elapsed time in Nanosecods
+    - Delay for Micro seconds    
+    - Delay for Milli seconds
+    - Disable debug logging
+    - Isolate pin Assignments for each change between boards
+    - Converting ints to floats for calcs
+    - specifying float constants
+
+
+#### Please See our [2 pin variable cap read example](../ex-gpio-measure-time-to-change-high-to-low) - It is similar but uses 2 pins to avoid the need to change pin direction.
+
+Early testing of this version shows that either Rust
+or EPS32 S3 is adding sufficient random time delays
+when changing pin direction that results are erratic.
+Using 2 pins one for sensing and one for drive helped
+remove the erratic timing.
+
+I think the erratic timing on pin change may be caused 
+by the debug or logging stubs so keeping this example 
+for when we figure it out. In therory it should take 
+longer to drain a capacitor from 3V to 0.7V than it
+takes to charge it from 0V to 3.3V so this version should
+be able to operate with lower resistor values and/or 
+slower CPU speeds without sacrificing accuracy.
+
 
 ### Source
 - [Rust source main.rs](src/main.rs)
 - [Cargo.toml](Cargo.toml)
-- [Capacitive fluid level sensor schematic](Capacitive-Fluid-Level-Sensor-schematic.epro) for easyEDA pro.
+- [Capacitive fluid level sensor schematic](../ex-gpio-measure-time-to-change-high-to-low/Capacitive-Fluid-Level-Sensor-schematic.epro) for easyEDA pro.
 
-### Our Variable Capacitor
- We tape two aluminum strips on opposite sides of a bottle. One strip oscillates from 0V to a logic high transition at about 0.7V. The second strip is connected to ground and runs on the opposite side of the bottle. This forms a capacitor with air as the dielectric when empty and water as the dielectric as water is added.
 
-**WHY**:Many of my designs rely heavily on capacitive sensing. However, not all my preferred CPUs, such as the ESP C2 and RP2040, have built-in touch sensors. Although the ESP32 does, existing Rust libraries (esp-idf-hal and esp-hal) currently lack Rust-safe wrappers for this functionality.
-
-To avoid the complexities of low-level access through esp-idf-sys, I'm seeking a cross-platform alternative that will work across different CPUs until these libraries are updated.
+### WHY
+Many of my designs rely heavily on capacitive sensing. However, not all my preferred CPUs, such as the ESP C2 and RP2040, have built-in touch sensors. Although the ESP32 does, existing Rust libraries (esp-idf-hal and esp-hal) currently lack Rust-safe wrappers for this functionality.
 
 Tested on esp32-s3-mini-1 on custom RaimAmp.com board on 2024-04-20
 
@@ -41,11 +73,17 @@ Even with tanks of variable shapes, interpolation from point to point can be use
 
 ### Steps:
 
-1. Drive discharge pin Low and provide enough time for the circuit to fully discharge.
-2. Change the pin's drive mode to high impedance status.
-3. Measure the time it takes for a high impedance input pin to charge from 0V to logic 
-   high threashold of approximate 0.7v. 
-4. Use fast polling to detect when the circuit voltage rises to logic high .
+1. Drive discharge pin Low and provide enough time for the circuit to fully discharge.  This is critical because any residual charge will affect 
+timing in future steps.
+1. Change ping to drive High 
+1. Allow to charge for a fixed and exact amount of time set to allow 
+   charge to very near 3V. Error on longer rather shorter to deliver
+   most consistent results. 
+2. Change the pin's drive mode to high impedance Read status.
+3. Measure the time it takes for a high impedance input pin to discharge
+   from 3.3VV to logic low approx 0.7V
+4. Use fast polling to detect when the circuit Pin state changes 
+   from high to low. 
 
 ### Theory:
 
@@ -56,42 +94,10 @@ Time to discharge 4pf capacitor through 5M resistor from 3.3V to 0.7V is 29 micr
 we would need to increase resistance to provide sufficient CPU cycles to count accurately. 
 - [../discharge-time-to-capacitance.py](discharge-time-to-capacitance.py)
 - [../time-to-discharge-capacitor.py](time-to-discharge-capacitor.py)
-- The initial tests for this were run with an 8-megaohm 
-  resistor on an ESP32 S3 running at 40 MHz.
-
-  We chose this resistor value to ensure enough time for proper sensing at the lower end of our capacitance
-  range. This means that as the low-end capacitance drops, we need to increase the resistance value. Conversely, if the CPU is running faster (say, at 240 MHz), we could achieve equivalent readings with a resistor value one-sixth the size, which would be approximately 1.33 megaohms.
-
-  Conversely, increasing the electrode surface area or moving them closer together will also increase capacitance. This allows us to reduce the resistor value and/or increase the clock speed (of the CPU).
-
-  In general, I aim to balance this by targeting at least a 20-unit count change per 1% change in capacitance. However, this is just a guideline.
-
-### Justification for approximations:
-
-* The exact voltage level for a read high to read low transition might not be precisely defined. However, for a single CPU pin, the transition tends to be consistent, especially when using oversampling to average out any deviations.
-* On a TI MSP430 CPU, a typical pin capacitance of around 26pF is observed. This value serves as a baseline. The variable capacitor will add to or subtract from the discharge time. While ESP32 likely has a different capacitance value, and capacitance might vary slightly between CPUs, it should remain consistent for a single CPU across multiple reads, allowing us to remove it as an offset.
 
 
-### ESP32 Rust Capabilities demonstrated:**
-- Measure elapsed time
-- Measure variable capacitance
-- Detect change in GPIO state
-- Demonstrate Open Drain high-impedance pins 
-- Drive I/O pin high 
-- Delay for a specific duration
-- Read GPIO pin status
-- Change OpenDrive GPIO pin mode between Drain and high impedance
-- Oversampling to improve reading stability 
 
-
-### Library Selection:
-
-* `esp-idf-hal`: This example utilizes `esp-idf-hal` because we intend to integrate similar code into a larger application later. We also aim to experiment with the `std::time::duration` feature on ESP32. While `esp-idf-hal` might be suitable for higher-level code, `esp-hal` is generally a better fit for low-level code.
-
-**Note:**
-
-
-See Also: 
+### See Also: 
    - https://github.com/esp-rs/esp-idf-hal
    - https://docs.esp-rs.org/esp-idf-hal/esp_idf_hal/
    - https://github.com/esp-rs/esp-idf-hal/tree/master/examples
@@ -100,36 +106,30 @@ See Also:
 # Setup
 -  See wiring capacitive sensor below
 
-### Diagnosing USB connections in Linux
-    # Show a list of currently connected USB devices
-    lsusb  
-    # Show details about connections
-    lsusb -v | more
 
 ## Expected Wiring
 
   #### CPU Pin Assignments
   - LED1 - LED Pin on GPIO-11
   - SENS1- GPIO pin used as sensor On GPIO-1
-  - SENS2- GPIO pin used as driver On GPIO-2
+  
       
   #### Wiring 
-  - GPIO Pin ->  LED ->  4.7K resistor -> Ground  
-  - Sense1 -> 10M 0.1% resistor -> 3.3V
+  - GPIO Pin ->  LED ->  4.7K resistor -> GND
+  - Sense1 -> 10M 0.1% resistor -> GND
   - Sense1 -> Alumimum Foil or Tape strip affixed outside of bottle
               Some foil has plastic coating make sure you have zero 
               Ohm measued from connecting wire to Foil. 
-  - Sense2 -> Sense1
+  - Sense_GRND -> GND
 
-  
   #### Capacitive Sensor schematic
   ![alt text](img/measure-capacitance-schematic.jpg)
   
   #### LED Schematic
   ![alt text](../ex-uart-echo-rs485/schematic-led.jpg)
 
-  I used GPIO 11 on a my custom board.  You will need to find the 
-  LED pin for your board and use it. 
+  I used GPIO 11 for LED on a my custom board.  You will need to find the 
+  LED pin for your board and change code to match.
 
 
 ## Running Under Rust
@@ -204,22 +204,6 @@ this increases capacitance.
 - Keep wire from sensor electrode as short as possible otherwise it picks up electrical noise can can produce erratic readings.
 - Need to re-run calibration readings with 1/2 once of water as starting point 
   to better isolate early bump.
-
-
-# Variation from Original design intent
-I originally designed this to charge the circuit to 3.3V and through 
-a single pin then measure the time it takes discharge to 0.7V thinking
-the larger change in voltage would be easier to measure and using only
-a single pin.   I found that the rust pin direction change 
-added so much variability in timing that it was unworkable.  
-The same logic worked in other CPU in C so don't know if it is an issue
-in ESP32 or in the ESP32 rust implementation.   Kept the pin state change 
-lines commented so we have the syntax documented when rust fixes 
-their issues.  
-
-I Think the conversion from input to output we originally
-tried failed due to some weird semi random delay when converting
-the pin from input to output. 
 
 The code `let mut csense_in = csenseOut.into_input()?;` converted from output pin to 
 input pin and did seem to allow us to read state of the pin but it was not reliable 

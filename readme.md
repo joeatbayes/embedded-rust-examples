@@ -25,6 +25,20 @@ with 4MB flash and 2MB PS RAM.
 - GPIO Read GPIO Status 
 
 - GPIO Change Pin from Input to Output and back
+  - **[ex-gpio-change-pin-direction-var-cap-read-1-pin](ex-gpio-change-pin-direction-var-cap-read-1-pin)** Similar to our [two pin variable cap read](ex-gpio-measure-time-to-change-high-to-low) but
+  rather than measuring time to rise from 0 to 0.7V 
+  this version measures time to drop from VCC to 0.7V
+  while using only 1 pin. *esp-idf-hal*
+    - Change GPIO Pin Direction
+    - Read GPIO Status
+    - Using Polling to detect GPIO status change
+    - Measure elapsed time in Microseconds(uS)
+    - Measure elapsed time in Nanosecods
+    - Delay for Micro seconds    
+    - Disable debug logging
+    - Isolate pin Assignments for each change between boards
+    
+
 
 - Record time for GPIO to change Status
   - **[ex-gpio-measure-time-to-change-high-to-low](ex-gpio-measure-time-to-change-high-to-low)** - 
