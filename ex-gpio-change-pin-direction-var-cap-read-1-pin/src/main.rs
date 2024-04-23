@@ -1,27 +1,15 @@
-//! WARN: Broken until we can figure out how to 
-//! turn of GPIO Direction Change Logging.
-//! Use .... ../ex-gpio-measure-time-to-change-high-to-low)
-// - It is similar but uses 2 pins to avoid the need to change pin direction.
-/* SAMPLE OF LOG MESSAGES I CAN NOT DISABLE
-I (346) sleep: Configure to isolate all GPIO pins in sleep state
-I (353) sleep: Enable automatic switching of GPIO sleep configuration
-I (361) main_task: Started on CPU0
-I (371) main_task: Calling app_main()
-I (371) gpio: GPIO[11]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (381) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (391) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (411) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (411) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (411) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
-I (421) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown
-*/
-//! 
-//! 
 //! 
 //! Measure change in capacitance by measuring time to discharge a 
 //! a capacitor from! VCC (3.3V) to logic 0 at approximately 0.7V
 //! We Oversample and average this across a large number of passes 
 //! to help filter out noise.
+//! See Also: ../ex-gpio-measure-time-to-change-high-to-low)
+//! - It is similar but uses 2 pins to avoid the need to change pin direction.
+//! 
+//! WARN: See readme.md for sdkconfig.default settings
+//!   This example will not work without those settings
+//!   due to erratic timing delays from logging. 
+//!
 //! See readme.md for pin mapping and explanation
 #![allow(unused_imports)]
 #![allow(dead_code)]
@@ -105,6 +93,7 @@ fn main() -> anyhow::Result<()> {
         println!("elap during pin state change cnt={:?} {:?}ms", tout, ((elap1 as f64 / num_pass as f64 ) / 1000000_f64));
         led.set_low()?;                
         
+        //unsafe { vTaskDelay(18) };
         delay.delay_ms(18); // Allow WDT to auto clear
           // TODO: TO RESET WATCHDOG IN TIGHT LOOP LIKE THIS
           // without depending on sleep time for auto reset

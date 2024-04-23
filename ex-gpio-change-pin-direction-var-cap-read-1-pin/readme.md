@@ -27,19 +27,10 @@ This method can also be used to sense human touch. With a large enough sensor, i
 
 #### Please See our [2 pin variable cap read example](../ex-gpio-measure-time-to-change-high-to-low) - It is similar but uses 2 pins to avoid the need to change pin direction.
 
-Early testing of this version shows that either Rust
-or EPS32 S3 is adding sufficient random time delays
-when changing pin direction that results are erratic.
-Using 2 pins one for sensing and one for drive helped
-remove the erratic timing.
-
-I think the erratic timing on pin change may be caused 
-by the debug or logging stubs so keeping this example 
-for when we figure it out. In therory it should take 
-longer to drain a capacitor from 3V to 0.7V than it
-takes to charge it from 0V to 3.3V so this version should
-be able to operate with lower resistor values and/or 
-slower CPU speeds without sacrificing accuracy.
+In therory it should take longer to drain a capacitor from 3V to 0.7V than
+it takes to charge it from 0V to 3.3V so this version should be able to
+operate with lower resistor values and/or slower CPU speeds without 
+sacrificing accuracy.
 
 
 ### Source
@@ -113,7 +104,26 @@ we would need to increase resistance to provide sufficient CPU cycles to count a
   - LED1 - LED Pin on GPIO-11
   - SENS1- GPIO pin used as sensor On GPIO-1
   
-      
+  #### sdkconfig.defaults
+  Ensure your sdkconfig.defaults include the following settings.  Without them weird logging every time we change the pin direction messed up the timing in our tight 
+  loop.   
+ ```
+  # Turn of log entries every time the pin state changes
+  CONFIG_LOG_DEFAULT_LEVEL_NONE=y
+
+  # Provide maximum time before watchdog timer fires so we 
+  # can have enough time to complete higher capacitance
+  # readings.  Values are 1..60
+  CONFIG_ESP_TASK_WDT_TIMEOUT_S=60
+
+  # Not sure why this helped but it seemed to remove erratic
+  # delays that messed up timing measurements.
+  CONFIG_ESP_DEBUG_STUBS_ENABLE=n
+
+  # Allow 1ms freetos task delays instead of default 10
+  CONFIG_FREERTOS_HZ=1000
+  ```
+
   #### Wiring 
   - GPIO Pin ->  LED ->  4.7K resistor -> GND
   - Sense1 -> 10M 0.1% resistor -> GND
