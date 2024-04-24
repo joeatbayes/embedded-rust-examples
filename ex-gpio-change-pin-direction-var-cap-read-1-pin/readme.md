@@ -5,7 +5,7 @@
 This example demonstrates measuring changes in capacitance by recording the time it takes for a variable capacitor to discharge near VCC (3.3V) to 0.7V through a known resistor.  It does this with only logic level transitions without requiring a ADC
 or analog comparator. 
 
-*Tested on esp32-s3-mini-1 on custom RaimAmp.com board on 2024-04-23*
+Tested on esp32-s3-mini-1 on custom RaimAmp.com board on 2024-04-23
 
 ### Fluid Level Sensing in Embedded Rust on ESP32 CPU by measuring change in Capacitance
 For testing the electrode will be a two foil strips afixed to 
