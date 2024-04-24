@@ -9,8 +9,7 @@ or analog comparator.
 
 ### Fluid Level Sensing in Embedded Rust on ESP32 CPU by measuring change in Capacitance
 For testing the electrode will be a two foil strips afixed to 
-the outside of a water bottle.  The Capacitance is varied by filling the bottle with various amounts of water.  One strip oscilates from VCC to 0.7V while the other on the opposite side of bottle is connected to ground.  This forms a capacitor with air as the dielectric when empty and water as the dielectric as water is added. As more
-water is added capacitance of the circuit increases.
+the outside of a water bottle.  The Capacitance is varied by filling the bottle with various amounts of water.  One strip oscilates from VCC down to 0.7V while the other on the opposite side of bottle is connected to ground.  This forms a capacitor with air as the dielectric when empty and water as the dielectric as water is added. As more water is added capacitance of the circuit increases.
 
 ### Human Proximity Sensing. 
 This method can also be used to sense human touch. With a large enough sensor, As shown below it can detect changes in human proximity as a person moves closer to or further from the sensor.   With a larger sensor it could easily detects a human moving closer or away within a 1 meter range.
