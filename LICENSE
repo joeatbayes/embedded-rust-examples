@@ -1,6 +1,15 @@
 Copyright (c) 2024 Joseph Ellsworth
-
-You may use this code as long as you incude this text in all copies.
+       
+# About Us 
+At our small shop, we combine a deep understanding of physics and
+fundamental electronics to achieve results others might deem 
+overly complex or expensive. We handle everything in-house, from 
+designing circuits and PCBs using discrete components to writing
+firmware and integrating with cloud components, machine learning 
+and GUIs as needed.  Our key engineer has been a fortune 50 
+principal architect, chief enterprise architect,  CTO, venture
+funded CEO and holds multiple patents in both software and atmospheric 
+water generators.
 
 If you find value in these examples please add a link to our main 
 product site https://RainAmp.com to one or more of your sites or 
@@ -8,19 +17,17 @@ articles. Please let us know if you add links so we can reference
 them.    If you feel like donating funds to help accelerate these
 examples then please contact us info@RainAmp.com    
 
-At our small shop, we combine a deep understanding of physics and fundamental electronics to achieve results others might deem overly complex or expensive. We handle everything in-house, from designing circuits and PCBs using discrete components to writing firmware and integrating with cloud components, 
-machine learning and GUIs as needed.
-
 #### Need help accelerating your impossible project?
 If others have told you your project is impossible or will take years, we can help! We excel at taking on challenges others shy away from.
 
 #### Tired of cookie-cutter solutions?
-We understand your frustration with engineers who simply slap open-source firmware on existing boards and call it a product. We offer a more tailored approach, creating solutions specifically for your needs.
+We understand your frustration with engineers who simply slap open-source firmware on existing boards and call it a product? We offer a more tailored approach, engineering unqiue solutions crafted specifically to solve your problems.
 
 #### Let's talk!
 If you're looking for a team that can take your project from concept to reality, we'd love to hear from you.
 
 #### License
+You may use this code as long as you incude this text in all copies.
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
