@@ -90,7 +90,7 @@ fn main() -> anyhow::Result<()> {
             csense_in = cout.into_input()?; 
               // places drive pin into high impedance mode.
               // stops charging capacitor leaving pin in 
-              // input mode so we can sense hole long it takes
+              // input mode so we can sense how long it takes
               // to drain.
             let mut cnt = 0;            
             // Wait for capacitor to drain to ground
